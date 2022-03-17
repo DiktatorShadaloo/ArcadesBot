@@ -57,7 +57,6 @@ def run_IRC():
      REPOthread.start()
      while True:
           response = sock.recv(1024).decode("utf-8")
-          print(response)
           if response == "PING :tmi.twitch.tv\r\n":
                print ('PONG')
                sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
@@ -67,9 +66,6 @@ def run_IRC():
                     ban(username)
                     msg = "%s, agarra todo eso, hace un rollito y metetelo bien por el ****" % username
                     chat(msg)
-                    
-               
-               print(username)
 
           
 
