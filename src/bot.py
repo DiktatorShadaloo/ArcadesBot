@@ -408,7 +408,7 @@ async def vaciarfichas(ctx, user: str = None):
 # Comando que retorna el enlace del repositorio de este bot.
 @ArcadesBot.command()
 async def repo(ctx):
-    MENSAJE = "Queres saber como esta hecho Arcadesbot? Aca tenes el repositorio: <Aca va un link>"
+    MENSAJE = "Queres saber como esta hecho Arcadesbot? Aca tenes el repositorio: https://github.com/DiktatorShadaloo/ArcadesBot"
     await ctx.send(f"%s" % MENSAJE)
 ###########################################################################################################################
 
