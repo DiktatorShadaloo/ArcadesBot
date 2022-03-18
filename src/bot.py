@@ -1,6 +1,3 @@
-from distutils.sysconfig import PREFIX
-from enum import auto
-from sys import prefix
 from twitchio.ext import commands
 from src.db_manager import *
 from src.common_functions import *

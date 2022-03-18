@@ -56,11 +56,14 @@ def run_IRC():
           if response == "PING :tmi.twitch.tv\r\n":
                sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
           else:
-               username = re.search(r"\w+", response).group(0)  
-               if ([x.lower() in response.lower() for x in BANNED_MESSAGES]) :
-                    ban(username)
-                    msg = "%s, agarra todo eso, hace un rollito y metetelo bien por el ****" % username
-                    chat(msg)
+               username = re.search(r"\w+", response).group(0)
+              
+               for x in BANNED_MESSAGES:
+                    if x.lower() in response.lower():
+                         ban(username)
+                         msg = "%s, agarra todo eso, hace un rollito y metetelo bien por el ****" % username
+                         chat(msg)
+                         break
 
           
 
