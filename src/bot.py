@@ -106,7 +106,7 @@ async def agregarxbits( ctx , user: str = None, bits: str = None):
     await ctx.send(MENSAJE)
 ###########################################################################################################################  
 
-# Comando para agregar fichas a un usuario que se hizo sub (la idea es que el client lo haga solo pero se implementa por las dudas).
+# Comando para agregar fichas a un usuario que se hizo sub.
 @ArcadesBot.command()
 async def agregarxsub( ctx , user: str = None):
 
