@@ -19,44 +19,51 @@ async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
     if event.reward.title == REWARD_NAME:
      #Obtengo el user que canjeo la recompensa y las fichas 
         user  = event.user.name.lower()
-        fichas_gastadas = (event.input.title().split(";", 1)[0]).replace(" ","")
+        arrayinput = event.input.title().split(";", 1)
+        fichas_gastadas = (arrayinput[0]).replace(" ","")
      #Chequeo que la fichas sean un entero mayor a 0
         if fichas_gastadas.isdigit() and int(fichas_gastadas)>0 :
             fichas_gastadas = int(fichas_gastadas)
 
          #Chequeo que la fichas no superen al maximo definido por el dueño del canal.
             if fichas_gastadas <= FICHAS_MAXIMAS:
-                juego = event.input.title().split(";", 1)[1]
-             #Chequeo que el nobre del juego no sea vacio. 
-                if juego. replace(" ","") != "":
-                 #Chequeo que el usuario tenga la cantidad de fichas suficientes y actualizo en la base de datos.
-                    restantes = actualizar_fichas(event.user.name.lower(),-fichas_gastadas)
-                    if (restantes>=0):
-                        fecha = datetime.strptime(str(event.timestamp).split("+", 4)[0], '%Y-%m-%d %H:%M:%S.%f').strftime("%H:%M:%S %d-%m-%y")
-                        data = [user, juego, fichas_gastadas,fecha]
-                        pluralFichas = Plurals(fichas_gastadas)
-                        pluralRestantes = Plurals(restantes)
-                        MENSAJE = "%s le puso %d %s al juego %s, ahora le quedan %d %s" % (user, fichas_gastadas, pluralFichas, juego, restantes, pluralRestantes)
+                if len (arrayinput) == 2:
+                    juego = event.input.title().split(";", 1)[1]
+                 #Chequeo que el nombre del juego no sea vacio. 
+                    if juego. replace(" ","") != "":
+                    #Chequeo que el usuario tenga la cantidad de fichas suficientes y actualizo en la base de datos.
+                        restantes = actualizar_fichas(event.user.name.lower(),-fichas_gastadas)
+                        if (restantes>=0):
+                            fecha = datetime.strptime(str(event.timestamp).split("+", 4)[0], '%Y-%m-%d %H:%M:%S.%f').strftime("%H:%M:%S %d-%m-%y")
+                            data = [user, juego, fichas_gastadas,fecha]
+                            pluralFichas = Plurals(fichas_gastadas)
+                            pluralRestantes = Plurals(restantes)
+                            MENSAJE = "%s le puso %d %s al juego %s, ahora le quedan %d %s" % (user, fichas_gastadas, pluralFichas, juego, restantes, pluralRestantes)
 
-                        insert_tablaCanjes(data)
+                            insert_tablaCanjes(data)
 
-                    #Se crean estos txt para utilizar en conjunto con Txt Trigger script para OBS.
-                        with open('UltimoPedido.txt', 'w') as f:
-                            f.write(fecha)
-
-                        with open('JuegoPedido.txt', 'w') as d:
-                            d.write(data[1])
-                    else:
-                         MENSAJE = "El usuario %s no tiene fichas suficientes!" % (user)
+                        #Se crean estos txt para utilizar en conjunto con Txt Trigger script para OBS.
+                            with open('UltimoPedido.txt', 'w') as f:
+                                f.write(fecha)
+                            with open('Usuario.txt', 'w') as f:
+                                f.write(user)
+                            with open('JuegoPedido.txt', 'w') as d:
+                                d.write(data[1])
+                        else:
+                            MENSAJE = "El usuario %s no tiene fichas suficientes!" % (user)
+                    else: 
+                        MENSAJE = "¡No especificaste que juego jugar!"
+                else: 
+                    MENSAJE =  'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
             else:
                     pluralFichas = Plurals(FICHAS_MAXIMAS)
                     MENSAJE = "¡Esas son demasiadas fichas! No podes poner mas de %d %s a la vez" % (FICHAS_MAXIMAS, pluralFichas)
         else:
-            MENSAJE = "El monto de fichas ingresado no es correcto "
+            MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
     print(MENSAJE)
     chat(MENSAJE)
     
-    
+
 @client.event()
 async def event_pubsub_bits(event: pubsub.PubSubBitsMessage):
  # Convierto user a minusculas y reviso la entrada. 
@@ -73,7 +80,7 @@ async def event_pubsub_bits(event: pubsub.PubSubBitsMessage):
         MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (lowuser, fichas, pluralAgregadas, cantTotal, pluralTotal)
 
     else:
-        MENSAJE = "Oh no! Esos bits no son suficientes para comprar una ficha, cada ficha cuesta %d bits!" % (PRECIO_BITS)
+        MENSAJE = "¡Oh no! Esos bits no son suficientes para comprar una ficha, cada ficha cuesta %d bits." % (PRECIO_BITS)
 
     print(MENSAJE)
     chat(MENSAJE)
