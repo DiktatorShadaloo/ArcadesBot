@@ -29,3 +29,9 @@ def actualizar_fichas(user,fichas):
 # Expresion regular para controlar que el username sea valido
 def allowed_chars(username):
    return re.match("^[A-Za-z0-9_-]*$", username)
+
+# Funcion que deja mas bonito el output en consola.
+def printear (MENSAJE):
+    print ('-' + MENSAJE)
+    print ('-------------------------------------------------------------------------------')
+    print ('')

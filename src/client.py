@@ -60,7 +60,8 @@ async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
                     MENSAJE = "¡Esas son demasiadas fichas! No podes poner mas de %d %s a la vez" % (FICHAS_MAXIMAS, pluralFichas)
         else:
             MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
-    print(MENSAJE)
+    printear(MENSAJE)
+
     chat(MENSAJE)
     
 
@@ -82,7 +83,7 @@ async def event_pubsub_bits(event: pubsub.PubSubBitsMessage):
     else:
         MENSAJE = "¡Oh no! Esos bits no son suficientes para comprar una ficha, cada ficha cuesta %d bits." % (PRECIO_BITS)
 
-    print(MENSAJE)
+    printear(MENSAJE)
     chat(MENSAJE)
     
 async def listener():
@@ -94,7 +95,7 @@ async def listener():
     # await client.start()
 
 def run_CLIENT():
-    print("Comienza el cliente")
+    printear("Comienza el cliente")
     client.loop.create_task(listener())
     #client.loop.run_until_complete(listener())
     client.run()

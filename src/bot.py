@@ -11,7 +11,7 @@ ArcadesBot = commands.Bot(
 
 @ArcadesBot.event()   
 async def event_ready():
-    print(f"Logged in as {BOT_NICK} in {CHANNEL}.")
+    printear(f"Logged in as {BOT_NICK} in {CHANNEL}.")
 
 ################################################################## COMANDOS ###############################################
 
@@ -59,7 +59,7 @@ async def agregarfichas( ctx , user: str = None, fichas: str = None):
     else:
         MENSAJE = "%s, No tenés los privilegios para usar este comando." % (ctx.author.name)
 
-    print(MENSAJE)
+    printear(MENSAJE)
     await ctx.send(MENSAJE)
 ###########################################################################################################################
 
@@ -102,7 +102,7 @@ async def agregarxbits( ctx , user: str = None, bits: str = None):
     else:
             MENSAJE = "%s, No tenés los privilegios para usar este comando." % (ctx.author.name)
 
-    print(MENSAJE)
+    printear(MENSAJE)
     await ctx.send(MENSAJE)
 ###########################################################################################################################  
 
@@ -140,7 +140,7 @@ async def agregarxsub( ctx , user: str = None):
         MENSAJE = "%s, No tenés los privilegios para usar este comando." % (ctx.author.name)
 
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 ###########################################################################################################################
 
 # Comando para agregar fichas a un usuario que hizo una donacion, como divisa estandar se usa el dolar.
@@ -183,7 +183,7 @@ async def agregarxdonacion(ctx , user: str = None, dinero: str = None):
         MENSAJE = "%s, No tenés los privilegios para usar este comando." % (ctx.author.name)
 
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 ###########################################################################################################################
 
 # Comando para sacar fichas a un usuario
@@ -225,7 +225,7 @@ async def sacarfichas(ctx , user: str = None, fichas: str = None):
     else:
         MENSAJE = "%s, no tenés los privilegios para usar este comando." % (ctx.author.name)
     
-    print(MENSAJE)
+    printear(MENSAJE)
     await ctx.send(MENSAJE)        
 ###########################################################################################################################
     
@@ -263,7 +263,7 @@ async def cantfichas(ctx, user: str = None):
         MENSAJE = "%s no seas chusma! No tenes los privilegios para mirar las fichas de otros!" % (ctx.author.name)
 
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 
 ###########################################################################################################################
     
@@ -301,7 +301,7 @@ async def cantgastadas(ctx, user: str = None):
         MENSAJE = "%s no seas chusma! No tenes los privilegios para mirar las fichas gastadas de otros!" % (ctx.author.name)
 
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 ###########################################################################################################################
 
 # Muestra el usuario con mas fichas.
@@ -320,7 +320,7 @@ async def usuariotop(ctx):
         MENSAJE = "Nadie tiene fichas, este Arcade se va a la bancarrota!"  
     
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 
 ###########################################################################################################################
 
@@ -341,7 +341,7 @@ async def gastadortop(ctx):
         MENSAJE = "Nadie gasto fichas, ¿para que se las guardan? Solo sirven en este arcade!"
     
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 ###########################################################################################################################
 
 # Muestra el total de fichas disponibles para usar actualmente.
@@ -360,7 +360,7 @@ async def totalfichas(ctx):
         MENSAJE = "Nadie tiene fichas, este Arcade se va a la bancarrota!"  
     
     await ctx.send(MENSAJE)
-    print(MENSAJE)
+    printear(MENSAJE)
 
 ###########################################################################################################################
 
@@ -398,7 +398,7 @@ async def vaciarfichas(ctx, user: str = None):
     else:
         MENSAJE = "%s, no tenés los privilegios para usar este comando." % (ctx.author.name)
 
-    print(MENSAJE)
+    printear(MENSAJE)
     await ctx.send(MENSAJE)
 ###########################################################################################################################
 
