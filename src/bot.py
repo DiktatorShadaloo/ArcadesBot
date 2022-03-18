@@ -342,7 +342,7 @@ async def cantgastadas(ctx, user: str = None):
     printear(MENSAJE)
 ###########################################################################################################################
 
-# Muestra el usuario con mas fichas.
+# Muestra el usuario con mas fichas disponibles.
 @ArcadesBot.command()
 async def usuariotop(ctx):
     
@@ -362,7 +362,7 @@ async def usuariotop(ctx):
 
 ###########################################################################################################################
 
-# Muestra el usuario con mas fichas.
+# Muestra el usuario que mas fichas gastó.
 @ArcadesBot.command()
 async def gastadortop(ctx):
     
