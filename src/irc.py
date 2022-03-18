@@ -5,6 +5,7 @@ from config.config import *
 import asyncio
 from threading import Thread
 from time import sleep
+from src.common_functions import printear
 
 # the twitch irc server to send a chat message.
 NICK= BOT_NICK.lower()
@@ -23,21 +24,21 @@ def reconnect():
      connected = False
      global sock
      sock = socket.socket()
-     print( "Conexion del cliente perdida, intentando reconectar..." ) 
-     while connected == False and it <= 15:  
-          # attempt to reconnect, otherwise sleep for 2 seconds  
+     printear( "Conexion del cliente perdida, intentando reconectar..." ) 
+     while connected == False and it <= 15:   
           try:  
                sock.connect((HOST, PORT))
                sock.send("PASS {}\r\n".format(PASS).encode("utf-8"))
                sock.send("NICK {}\r\n".format(NICK).encode("utf-8"))
                sock.send("JOIN {}\r\n".format(CHANNEL[0].lower()).encode("utf-8"))  
                connected = True  
-               print( "reconexion exitosa" )  
+               printear( "reconexion exitosa" )  
           except socket.error:  
                sleep(1)
                it = it + 1
      if it >15:
-          print ("No se pudo reconectar, intenta reiniciar el programa.")
+          printear ("No se pudo reconectar, revisa tu conexion a internet e intenta reiniciar el programa.")
+
 # Envia un mensaje al chat
 def chat(MENSAJE):
      try:
@@ -72,11 +73,25 @@ def repo():
                chat(MENSAJE)
                REPO_time = datetime.now()
 
+# Funcion concurrente para enviar PING al servidor y asi evitar desconexiones o intentar reconectar mas frecuentemente.
+def PING():
+     PING_time = datetime.now()
+     while True:
+          difference = datetime.now() - PING_time
+          if difference.total_seconds() > 10:
+               try:
+                    sock.send("PING :tmi.twitch.tv\r\n".encode("utf-8"))
+                    PING_time = datetime.now()
+               except socket.error:
+                    reconnect()
+
 def run_IRC():
      RIPthread = Thread(target = RIP, args = ())
      REPOthread = Thread(target = repo, args = ())
+     PINGthread = Thread(target = PING, args = ())
      RIPthread.start()
      REPOthread.start()
+     PINGthread.start()
      while True:
           response = sock.recv(1024).decode("utf-8")
           if response == "PING :tmi.twitch.tv\r\n":
@@ -91,7 +106,7 @@ def run_IRC():
                          chat(msg)
                          break
 
-          
+
 
 
 def main_IRC():
