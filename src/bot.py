@@ -18,7 +18,7 @@ async def event_ready():
 # Comando de ayuda
 @ArcadesBot.command()
 async def help(ctx):
-    MENSAJE = "Los comandos solo para mods son: %sagregarfichas <usuario> <fichas> | %sagregarxsub <usuario> | %sagregarxdonacion <usuario> <monto> | %ssacarfichas <usuario> <fichas>| %sagregarxbits <usuario> <bits> | %svaciarfichas <usuario>" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
+    MENSAJE = "Los comandos solo para mods son: %sagregarfichas <usuario> <fichas> | %sagregarxsub <usuario> | %sagregarxgifts <usuario> <cantidad> | %sagregarxdonacion <usuario> <monto> | %ssacarfichas <usuario> <fichas>| %sagregarxbits <usuario> <bits> | %svaciarfichas <usuario>" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
     MENSAJE = "Los comandos para mods y espectadores son: %scantfichas <usuario> | %scantgastadas <usuario> | %sgastadortop | %susuariotop | %stotalfichas| %srepo" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
@@ -122,6 +122,44 @@ async def agregarxsub( ctx , user: str = None):
             not lowuser.isdigit()
         ):
             fichas = FICHAS_X_SUB
+
+         # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
+            cantTotal=actualizar_fichas(lowuser,fichas)
+
+         # Corrijo los plurales para el mensaje de chat.
+            pluralTotal = Plurals(cantTotal)
+            pluralAgregadas = Plurals(fichas)
+
+            MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (user, fichas, pluralAgregadas, cantTotal, pluralTotal)
+
+        else: 
+            MENSAJE = "Los datos ingresados no son correctos, si tenes dudas de como usar el comando, usa el comando !help."
+
+ # Si no tiene los privilegios lo notifico.
+    else:
+        MENSAJE = "%s, No tenés los privilegios para usar este comando." % (ctx.author.name)
+
+    await ctx.send(MENSAJE)
+    printear(MENSAJE)
+###########################################################################################################################
+
+# Comando para agregar fichas a un usuario que regalo subs (si quieren darle fichas a quien recibio las subs de regalo, deberan agregarse a mano, twichio da error al recibir un evento de subcripcion y por eso no se implementa para hacerlo automatico, queda para mas adelante).
+@ArcadesBot.command()
+async def agregarxgifts( ctx , user: str = None, cantidad: str = None):
+
+ # Reviso que el comando haya sido usado por un moderador o el dueño del canal.
+    autor = ctx.author.name.lower()
+    if ( autor in [x.lower() for x in MODS] or autor == CHANNEL[0].replace("#","")):
+
+     # Convierto user a minusculas y reviso la entrada 
+     # Admito que el comando sea usado con @user para aprovechar el autocompletado, se le saca el @ para ser almacenado en la DB.
+        lowuser = (user.lower()).replace("@","")
+        if (
+            allowed_chars(lowuser) and 
+            not lowuser.isdigit() and
+            cantidad.isdigit()
+        ):
+            fichas = FICHAS_X_SUB * int(cantidad)
 
          # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
             cantTotal=actualizar_fichas(lowuser,fichas)
