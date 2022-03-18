@@ -4,7 +4,7 @@ from datetime import datetime
 from config.config import *
 import asyncio
 from threading import Thread
-
+from time import sleep
 
 # the twitch irc server to send a chat message.
 NICK= BOT_NICK.lower()
@@ -18,13 +18,39 @@ sock.send("PASS {}\r\n".format(PASS).encode("utf-8"))
 sock.send("NICK {}\r\n".format(NICK).encode("utf-8"))
 sock.send("JOIN {}\r\n".format(CHANNEL[0].lower()).encode("utf-8"))
 
+def reconnect():
+     it =0
+     connected = False
+     global sock
+     sock = socket.socket()
+     print( "Conexion del cliente perdida, intentando reconectar..." ) 
+     while connected == False and it <= 15:  
+          # attempt to reconnect, otherwise sleep for 2 seconds  
+          try:  
+               sock.connect((HOST, PORT))
+               sock.send("PASS {}\r\n".format(PASS).encode("utf-8"))
+               sock.send("NICK {}\r\n".format(NICK).encode("utf-8"))
+               sock.send("JOIN {}\r\n".format(CHANNEL[0].lower()).encode("utf-8"))  
+               connected = True  
+               print( "reconexion exitosa" )  
+          except socket.error:  
+               sleep(1)
+               it = it + 1
+     if it >15:
+          print ("No se pudo reconectar, intenta reiniciar el programa.")
 # Envia un mensaje al chat
 def chat(MENSAJE):
-    sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
+     try:
+          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
+     except socket.error:
+          reconnect()
 
 # Banea a un usuario
 def ban(USER):
-    sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
+     try:
+          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
+     except socket.error:
+          reconnect()
 
 # Funcion concurrente para hacer homenaje al caido Fichinbot U_U
 def RIP ():
