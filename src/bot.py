@@ -63,7 +63,7 @@ async def agregarfichas( ctx , user: str = None, fichas: str = None):
     await ctx.send(MENSAJE)
 ###########################################################################################################################
 
-# Comando para agregar fichas a un usuario
+# Comando para agregar fichas a un usuario que donó bits.
 @ArcadesBot.command()
 async def agregarxbits( ctx , user: str = None, bits: str = None):
 
