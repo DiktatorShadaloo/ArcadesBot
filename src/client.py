@@ -16,7 +16,7 @@ client.pubsub = pubsub.PubSubPool(client)
 @client.event()
 async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
     
-    if event.reward.title == REWARD_NAME:
+    if event.reward.title == REWARD_INSERT_COINS:
      #Obtengo el user que canjeo la recompensa y las fichas 
         user  = event.user.name.lower()
         arrayinput = event.input.title().split(";", 1)
@@ -60,10 +60,20 @@ async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
                     MENSAJE = "¡Esas son demasiadas fichas! No podes poner mas de %d %s a la vez" % (FICHAS_MAXIMAS, pluralFichas)
         else:
             MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
-    printear(MENSAJE)
+        printear(MENSAJE)
 
-    chat(MENSAJE)
-    
+        chat(MENSAJE)
+    elif (REWARD_BUY_COIN != "" and event.reward.title == REWARD_BUY_COIN):
+        fichas = 1
+        user  = event.user.name.lower()
+     # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
+        cantTotal = actualizar_fichas(user,fichas)
+     # Corrijo los plurales para el mensaje de chat.
+        pluralTotal = Plurals(cantTotal)
+        pluralAgregadas = Plurals(fichas)
+        MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (user, fichas, pluralAgregadas, cantTotal, pluralTotal)
+        printear(MENSAJE)
+        chat(MENSAJE)
 
 @client.event()
 async def event_pubsub_bits(event: pubsub.PubSubBitsMessage):

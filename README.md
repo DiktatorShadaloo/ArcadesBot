@@ -1,7 +1,7 @@
 # ArcadesBot
 Sucesor espiritual de el Fichinbot empezado por mksh, Arcadesbot recicla partes de Fichinbot hechas por mi, el resto fue rehecho de 0.
 
-Arcadesbot mantiene un registro de "fichas arcades" que pueden ser agregadas a un usuario por medio de comandos o automaticamente con el evento de donación de bits.
+Arcadesbot esta diseñado para usarse en un canal [Twitch](https://www.twitch.tv) y su fin es mantener un registro de "fichas arcade" que pueden ser agregadas o canjeadas a un usuario por medio de comandos, automaticamente con el evento de donación de bits o usando canjeo de recompensas, todo esto utilizando la libreria [TwitchIO](https://github.com/TwitchIO/TwitchIO).
 
 Arcadesbot tambien es capaz de banear autoamticamente a usuarios que en el chat escriban frases o palabras que se incluyan en la seccion [BANNED_MESSAGES] util para banear bots que hagan spam.
 
@@ -71,3 +71,6 @@ Muestra el usuario con mas fichas gastadas:
 Muestra el total de fichas disponibles para usar actualmente. (La sumatoria de fichas entre todos los usuarios) :
 
 `!totalfichas​​​​​​​​​​​​​​​​​​​​​ `
+
+## Base de Datos
+La base de datos es creada automaticamente dentro de la carpeta ArcadesBot/db
