@@ -20,7 +20,7 @@ async def event_ready():
 async def help(ctx):
     MENSAJE = "Los comandos solo para mods son: %sagregarfichas <usuario> <fichas> | %sagregarxsub <usuario> | %sagregarxgifts <usuario> <cantidad_regaladas> | %sagregarxdonacion <usuario> <monto> | %ssacarfichas <usuario> <fichas>| %sagregarxbits <usuario> <bits> | %svaciarfichas <usuario>" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
-    MENSAJE = "Los comandos para mods y espectadores son: %scantfichas <usuario> | %scantgastadas <usuario> | %sgastadortop | %susuariotop | %stotalfichas| %srepo" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
+    MENSAJE = "Los comandos para mods y espectadores son: %scantfichas <usuario> | %scantgastadas <usuario> | %sgastadortop | %susuariotop | %stotalfichas" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
 ###########################################################################################################################
 

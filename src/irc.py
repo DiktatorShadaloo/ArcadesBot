@@ -87,10 +87,10 @@ def PING():
 
 def run_IRC():
      RIPthread = Thread(target = RIP, args = ())
-     REPOthread = Thread(target = repo, args = ())
+     #REPOthread = Thread(target = repo, args = ())
      PINGthread = Thread(target = PING, args = ())
      RIPthread.start()
-     REPOthread.start()
+     #REPOthread.start()
      PINGthread.start()
      while True:
           response = sock.recv(1024).decode("utf-8")
