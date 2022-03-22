@@ -76,7 +76,9 @@ Muestra el total de fichas disponibles para usar actualmente. (La sumatoria de f
 La base de datos es creada automaticamente dentro de la carpeta ArcadesBot/db
 
 ## Configuración 
-Una vez descargado ArcadesBot, debemos renombrar "config example.ini" a "config.ini" y empezar a completar todas las variables.
+Una vez descargado ArcadesBot, debemos ir a la carpeta ArcadesBot/config y crear el archivo `config.ini` o renombrar `config example.ini` a `config.ini` y empezar a completar todas las variables.
+
+Este es un ejemplo de config.ini indicando para que es cada variable:
 
 ```ini
 ; Estos campos deben ser completados con tus valores antes de utilizar Arcadesbot, de lo contrario no funcionará.
@@ -85,6 +87,7 @@ bot_nick = Diktabot
 
 ;Token de autenticacion OATH del bot para poder conectarse automaticamente a twitch. Para mas info de como obtenerlo leer el README.
 bot_token = po09x0geme2hro817tznfd9tnlmlop
+
 ; Simbolo que se utilizara como prefijo para invocar comandos, ! es el utilizado por defecto.
 bot_prefix = !
 
@@ -127,3 +130,17 @@ fichas_maximas = 3
 [BANNED_MESSAGES]
 Buy followers, primes and viewers on
 ```
+Para obtener los OATH tokens necesarios se recomienda utilizar la web [https://twitchtokengenerator.com](https://twitchtokengenerator.com), aqui tambien podremos activar los scopes necesarios para el manejo de bits, banns, etc.
+
+En el caso particular de ArcadesBot primero es necesario acceder con la cuenta de nuestro bot y activar los scopes ´chat:read´, ´chat:read´ y ´channel:moderate´, luego le damos click sobre "Generate Token!", en el campo ACCESS TOKEN, obtendremos el token que va en el campo "bot_token".
+
+Luego sera necesario ingresar de nuevo a [https://twitchtokengenerator.com](https://twitchtokengenerator.com) con la cuenta de nuestro canal y activar los scopes `bits:read` y `channel:read:redemptions` luego le damos click sobre "Generate Token!", en el campo ACCESS TOKEN, obtendremos el token que va en el campo "channel_token". Ahora para obtener el channel_id necesitamos el ACCESS TOKEN y el CLIENT ID, vamos a [REQBIN](https://reqbin.com/curl) y ejecutamos 
+
+```shell
+curl -X GET 'https://api.twitch.tv/helix/users'
+-H 'Client-ID: uo6dggojyb8d6soh92zknwmi5ej1q2' \
+-H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+```
+sustituyendo los valores por los de nuestro CLIENT ID y nuestro ACCESS TOKEN respectivamente, de ahi obtendremos una respuesta "data" y debemos copiar el valor de "id", ese sera nuestro channel_id.
+
+El resto de varuables ya puede llenarse a mano y a gusto del usuario.
