@@ -5,9 +5,9 @@ Arcadesbot mantiene un registro de "fichas arcades" que pueden ser agregadas a u
 
 Arcadesbot tambien es capaz de banear autoamticamente a usuarios que en el chat escriban frases o palabras que se incluyan en la seccion [BANNED_MESSAGES] util para banear bots que hagan spam.
 
-##Comandos Disponibles
+## Comandos Disponibles
 
-###Comandos solo para usuarios con privilegios:
+### Comandos solo para usuarios con privilegios:
 
 Comando para agregar fichas a un usuario: 
 
@@ -46,7 +46,7 @@ Muestra la cantidad de fichas que gastó un usuario :
 `!cantgastadas <usuario>`
 
 
-###Comandos que pueden usar usuarios sin privilegios:
+### Comandos que pueden usar usuarios sin necesidad de privilegios:
 
 Comando  para mostrar los comandos disponibles en el chat :
 
