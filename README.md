@@ -130,17 +130,12 @@ fichas_maximas = 3
 [BANNED_MESSAGES]
 Buy followers, primes and viewers on
 ```
-Para obtener los OATH tokens necesarios se recomienda utilizar la web [https://twitchtokengenerator.com](https://twitchtokengenerator.com), aqui tambien podremos activar los scopes necesarios para el manejo de bits, banns, etc.
+Para obtener los OATH tokens necesarios se recomienda utilizar la web [twitchtokengenerator](https://twitchtokengenerator.com), aqui tambien podremos activar los scopes necesarios para el manejo de bits, bans, etc.
 
 En el caso particular de ArcadesBot primero es necesario acceder con la cuenta de nuestro bot y activar los scopes ´chat:read´, ´chat:read´ y ´channel:moderate´, luego le damos click sobre "Generate Token!", en el campo ACCESS TOKEN, obtendremos el token que va en el campo "bot_token".
 
-Luego sera necesario ingresar de nuevo a [https://twitchtokengenerator.com](https://twitchtokengenerator.com) con la cuenta de nuestro canal y activar los scopes `bits:read` y `channel:read:redemptions` luego le damos click sobre "Generate Token!", en el campo ACCESS TOKEN, obtendremos el token que va en el campo "channel_token". Ahora para obtener el channel_id necesitamos el ACCESS TOKEN y el CLIENT ID, vamos a [REQBIN](https://reqbin.com/curl) y ejecutamos 
+Luego sera necesario ingresar de nuevo a [twitchtokengenerator](https://twitchtokengenerator.com) con la cuenta de nuestro canal y activar los scopes `bits:read` y `channel:read:redemptions` y le damos click sobre "Generate Token!", en los campos ACCESS TOKEN y Client ID obtendremos los valores que van en el campo "channel_token" y client_id respectivamente.
+El resto de variables ya puede llenarse a mano y a gusto del usuario.
 
-```shell
-curl -X GET 'https://api.twitch.tv/helix/users'
--H 'Client-ID: uo6dggojyb8d6soh92zknwmi5ej1q2' \
--H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
-```
-sustituyendo los valores por los de nuestro CLIENT ID y nuestro ACCESS TOKEN respectivamente, de ahi obtendremos una respuesta "data" y debemos copiar el valor de "id", ese sera nuestro channel_id.
-
-El resto de varuables ya puede llenarse a mano y a gusto del usuario.
+## Ejecucion 
+Si se quiere ejecutar esto dentro de un entorno virtual, abrir el command prompt (CMD), ir a la carpeta de Arcadesbot y ejecutar primero venv.bat y luego run.bat. Si no se quiere ejecutar dentro de un entorno virtual simplemente haz doble click sobre run.bat. 
