@@ -45,7 +45,7 @@ def chat(MENSAJE):
           sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
-          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
+          chat(MENSAJE)
 
 # Banea a un usuario
 def ban(USER):
@@ -53,7 +53,7 @@ def ban(USER):
           sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
-          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
+          ban(USER)
 
 # Funcion concurrente para hacer homenaje al caido Fichinbot U_U
 def RIP ():
@@ -80,7 +80,7 @@ def PING():
      PING_time = datetime.now()
      while True:
           difference = datetime.now() - PING_time
-          if difference.total_seconds() > 10:
+          if difference.total_seconds() > 5:
                try:
                     sock.send("PING :tmi.twitch.tv\r\n".encode("utf-8"))
                     PING_time = datetime.now()
