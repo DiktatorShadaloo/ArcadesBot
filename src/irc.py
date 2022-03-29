@@ -45,6 +45,7 @@ def chat(MENSAJE):
           sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
+          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
 
 # Banea a un usuario
 def ban(USER):
@@ -52,6 +53,7 @@ def ban(USER):
           sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
+          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
 
 # Funcion concurrente para hacer homenaje al caido Fichinbot U_U
 def RIP ():
