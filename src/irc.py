@@ -27,10 +27,10 @@ def reconnect():
      printear( "Conexion del cliente perdida, intentando reconectar..." ) 
      while connected == False and it <= 15:   
           try:  
-               sock.connect((HOST, PORT))
-               sock.send("PASS {}\r\n".format(PASS).encode("utf-8"))
-               sock.send("NICK {}\r\n".format(NICK).encode("utf-8"))
-               sock.send("JOIN {}\r\n".format(CHANNEL[0].lower()).encode("utf-8"))  
+               sock2 = socket.socket()
+               sock2.connect((HOST, PORT))
+               sock2.send("PASS {}\r\n".format(PASS).encode("utf-8"))
+               sock2.send("NICK {}\r\n".format(NICK).encode("utf-8"))
                connected = True  
                printear( "reconexion exitosa" )  
           except socket.error:  
@@ -41,20 +41,27 @@ def reconnect():
 
 # Envia un mensaje al chat
 def chat(MENSAJE):
+     sock2 = socket.socket()
+     sock2.connect((HOST, PORT))
+     sock2.send("PASS {}\r\n".format(PASS).encode("utf-8"))
+     sock2.send("NICK {}\r\n".format(NICK).encode("utf-8"))
+     sock2.send("JOIN {}\r\n".format(CHANNEL[0].lower()).encode("utf-8"))
      try:
-          sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
+          sock2.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
           chat(MENSAJE)
 
 # Banea a un usuario
 def ban(USER):
-     try:
+     MENSAJE = "/ban " + USER
+     chat(MENSAJE)
+     ''' try:
           sock.send(("PRIVMSG %s :" % CHANNEL[0].lower() + "/ban " + USER +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
           ban(USER)
-
+     '''
 # Funcion concurrente para hacer homenaje al caido Fichinbot U_U
 def RIP ():
      RIP_time = datetime.now()
@@ -80,7 +87,7 @@ def PING():
      PING_time = datetime.now()
      while True:
           difference = datetime.now() - PING_time
-          if difference.total_seconds() > 5:
+          if difference.total_seconds() > 600:
                try:
                     sock.send("PING :tmi.twitch.tv\r\n".encode("utf-8"))
                     PING_time = datetime.now()
