@@ -50,7 +50,7 @@ def chat(MENSAJE):
           sock2.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
      except socket.error:
           reconnect()
-          chat(MENSAJE)
+          sock2.send(("PRIVMSG %s :" % CHANNEL[0].lower() + MENSAJE +"\r\n").encode("utf-8"))
 
 # Banea a un usuario
 def ban(USER):
