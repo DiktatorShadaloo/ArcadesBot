@@ -15,7 +15,7 @@ client.pubsub = pubsub.PubSubPool(client)
 
 @client.event()
 async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
-    
+    '''
     if event.reward.title == REWARD_INSERT_COINS:
      #Obtengo el user que canjeo la recompensa y las fichas 
         user  = event.user.name.lower()
@@ -43,12 +43,14 @@ async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
                             insert_tablaCanjes(data)
 
                         #Se crean estos txt para utilizar en conjunto con Txt Trigger script para OBS.
+                          
                             with open('UltimoPedido.txt', 'w') as f:
                                 f.write(fecha)
                             with open('Usuario.txt', 'w') as f:
-                                f.write(user)
+                                f.write(("%s inserto %d %s")%(user, fichas_gastadas, pluralFichas))
                             with open('JuegoPedido.txt', 'w') as d:
                                 d.write(data[1])
+                            
                         else:
                             MENSAJE = "El usuario %s no tiene fichas suficientes!" % (user)
                     else: 
@@ -61,9 +63,9 @@ async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
         else:
             MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
         printear(MENSAJE)
-
-        chat(MENSAJE)
-    elif (REWARD_BUY_COIN != "" and event.reward.title == REWARD_BUY_COIN):
+       # chat(MENSAJE)
+        '''
+    if (REWARD_BUY_COIN != "" and event.reward.title == REWARD_BUY_COIN):
         fichas = 1
         user  = event.user.name.lower()
      # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
@@ -71,9 +73,14 @@ async def event_pubsub_channel_points(event: pubsub.PubSubChannelPointsMessage):
      # Corrijo los plurales para el mensaje de chat.
         pluralTotal = Plurals(cantTotal)
         pluralAgregadas = Plurals(fichas)
+        fecha = datetime.now().strftime("%H:%M:%S %d-%m-%y")
+        with open('UltimaFichaAdquirida.txt', 'w') as f:
+            f.write(fecha)
+        
         MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (user, fichas, pluralAgregadas, cantTotal, pluralTotal)
         printear(MENSAJE)
         chat(MENSAJE)
+        # await client._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
 
 @client.event()
 async def event_pubsub_bits(event: pubsub.PubSubBitsMessage):

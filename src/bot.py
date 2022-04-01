@@ -1,3 +1,5 @@
+from datetime import datetime
+from threading import Thread
 from twitchio.ext import commands
 from src.db_manager import *
 from src.common_functions import *
@@ -9,9 +11,68 @@ ArcadesBot = commands.Bot(
     prefix=BOT_PREFIX, 
     initial_channels= CHANNEL)
 
+#Se implementa esto aca en vez de el cliente como solucion a que twitch aleatoreamente skipea la escritura de mensajes que se envian por medio del modulo IRC a pesar de ser correctamente enviados.
+def insertarfichas(data):
+     #Expresion regular para obtener el input del usuario
+        input = re.search(r"PRIVMSG +#[\w]* +:[\w\W\s]*",data).group(0)
+     #Expresion para obtener el usuario que canjeo la recompensa.
+        user = re.search(r"#[-_\w]*",input).group(0).replace('#','')
+        arrayinput = input.split(":", 1)[1].split(";",1)
+        fichas_gastadas = (arrayinput[0]).replace(" ","")
+     #Chequeo que la fichas sean un entero mayor a 0
+        if fichas_gastadas.isdigit() and int(fichas_gastadas)>0 :
+            fichas_gastadas = int(fichas_gastadas)
+
+         #Chequeo que la fichas no superen al maximo definido por el dueño del canal.
+            if fichas_gastadas <= FICHAS_MAXIMAS:
+                if len (arrayinput) == 2:
+                    juego = arrayinput[1]. replace("\r\n","") 
+                 #Chequeo que el nombre del juego no sea vacio. 
+                    if juego. replace(" ","") != "":
+                    #Chequeo que el usuario tenga la cantidad de fichas suficientes y actualizo en la base de datos.
+                        restantes = actualizar_fichas(user.lower(),-fichas_gastadas)
+                        if (restantes>=0):
+                            fecha = datetime.now().strftime("%H:%M:%S %d-%m-%y")
+                            data = [user, juego, fichas_gastadas,fecha]
+                            pluralFichas = Plurals(fichas_gastadas)
+                            pluralRestantes = Plurals(restantes)
+                            MENSAJE = "%s le puso %d %s al juego %s, ahora le quedan %d %s" % (user, fichas_gastadas, pluralFichas, juego, restantes, pluralRestantes)
+
+                            insert_tablaCanjes(data)
+
+                        #Se crean estos txt para utilizar en conjunto con Txt Trigger script para OBS.
+                            with open('UltimoPedido.txt', 'w') as f:
+                                f.write(fecha)
+                            with open('Usuario.txt', 'w') as f:
+                                f.write(("%s inserto %d %s")%(user, fichas_gastadas, pluralFichas))
+                            with open('JuegoPedido.txt', 'w') as d:
+                                d.write(data[1])
+                        else:
+                            MENSAJE = "¡%s no tiene fichas suficientes!" % (user)
+                    else: 
+                        MENSAJE = "¡No especificaste que juego jugar!"
+                else: 
+                    MENSAJE =  'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
+            else:
+                pluralFichas = Plurals(FICHAS_MAXIMAS)
+                MENSAJE = "¡Esas son demasiadas fichas! No podes poner mas de %d %s a la vez" % (FICHAS_MAXIMAS, pluralFichas)
+        else:
+            MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
+        printear(MENSAJE)
+        return MENSAJE
+
+def obtenerFicha(data):
+    pass
+
 @ArcadesBot.event()   
 async def event_ready():
     printear(f"Logged in as {BOT_NICK} in {CHANNEL}.")
+
+@ArcadesBot.event()
+async def event_raw_data(data):
+    if 'custom-reward-id' in data and INSERT_COINS_ID in data:
+        MENSAJE = insertarfichas(data)
+        await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
 
 ################################################################## COMANDOS ###############################################
 
