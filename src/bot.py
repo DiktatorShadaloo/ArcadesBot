@@ -10,13 +10,15 @@ ArcadesBot = commands.Bot(
     token=BOT_TOKEN, 
     prefix=BOT_PREFIX, 
     initial_channels= CHANNEL)
-
+ 
+ #@badge-info=;badges=glitchcon2020/1;color=#FF4500;custom-reward-id=47498d96-f450-4814-ac89-69673043c330;display-name=laider_ush;emotes=;first-msg=0;flags=;id=477019ed-2849-4f46-8f77-ffdc670a10f7;mod=0;room-id=561544295;subscriber=0;tmi-sent-ts=1648848830155;turbo=0;user-id=149696551;user-type= :laider_ush!laider_ush@laider_ush.tmi.twitch.tv PRIVMSG #diktatorshadaloo :2;super megaman
 #Se implementa esto aca en vez de el cliente como solucion a que twitch aleatoreamente skipea la escritura de mensajes que se envian por medio del modulo IRC a pesar de ser correctamente enviados.
 def insertarfichas(data):
      #Expresion regular para obtener el input del usuario
         input = re.search(r"PRIVMSG +#[\w]* +:[\w\W\s]*",data).group(0)
      #Expresion para obtener el usuario que canjeo la recompensa.
-        user = re.search(r"#[-_\w]*",input).group(0).replace('#','')
+        user = re.search(r"[-\w_]*.tmi.twitch.tv",data).group(0).replace('.tmi.twitch.tv','')
+        print(user)
         arrayinput = input.split(":", 1)[1].split(";",1)
         fichas_gastadas = (arrayinput[0]).replace(" ","")
      #Chequeo que la fichas sean un entero mayor a 0
@@ -70,6 +72,7 @@ async def event_ready():
 
 @ArcadesBot.event()
 async def event_raw_data(data):
+    print(data)
     if 'custom-reward-id' in data and INSERT_COINS_ID in data:
         MENSAJE = insertarfichas(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
