@@ -18,7 +18,6 @@ def insertarfichas(data):
         input = re.search(r"PRIVMSG +#[\w]* +:[\w\W\s]*",data).group(0)
      #Expresion para obtener el usuario que canjeo la recompensa.
         user = re.search(r"[-\w_]*.tmi.twitch.tv",data).group(0).replace('.tmi.twitch.tv','')
-        print(user)
         arrayinput = input.split(":", 1)[1].split(";",1)
         fichas_gastadas = (arrayinput[0]).replace(" ","")
      #Chequeo que la fichas sean un entero mayor a 0
@@ -72,7 +71,6 @@ async def event_ready():
 
 @ArcadesBot.event()
 async def event_raw_data(data):
-    print(data)
     if 'custom-reward-id' in data and INSERT_COINS_ID in data:
         MENSAJE = insertarfichas(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
