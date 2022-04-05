@@ -88,7 +88,7 @@ async def event_pubsub_bits(event: pubsub.PubSubBitsMessage):
     lowuser = event.user.name.lower()
     bits = event.bits_used
  #Reviso que el monto alcance para comprar una ficha.           
-    if (bits > PRECIO_BITS):
+    if (bits >= PRECIO_BITS):
         fichas = bits // PRECIO_BITS
      # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
         cantTotal=actualizar_fichas(lowuser,fichas)
