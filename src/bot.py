@@ -69,12 +69,12 @@ def agregarxbits_Automaticamente(data):
  # Expresion regular para obtener el usuario.
     lowuser = re.search(r"[-\w_]*.tmi.twitch.tv",data).group(0).replace('.tmi.twitch.tv','')
  # Expresion regular para obtener el la cantidad de bits.
-    bits= re.search (r"bits=[0-9]*", data.split('PRIVMSG',1)[0]).group(0).replace('bits=','')
+    bits= re.search (r"bits=[0-9]*", data.split('color=',1)[0]).group(0).replace('bits=','')
  # Lo agrego al array de restos de bits.
     if not (lowuser in restBits):
         restBits[lowuser]=0
 
-    fichas = int(bits) + restBits[lowuser] // PRECIO_BITS
+    fichas = (int(bits) + restBits[lowuser]) // PRECIO_BITS
     restBits[lowuser]= (int(bits) + restBits[lowuser]) % PRECIO_BITS
 
  # Reviso que haya obtenido fichas.
@@ -101,7 +101,7 @@ async def event_raw_data(data):
     if 'custom-reward-id' in data and INSERT_COINS_ID in data:
         MENSAJE = insertarfichas(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
-    elif 'bits=' in data.split('PRIVMSG',1)[0]:
+    elif 'bits=' in data.split('color=',1)[0]:
         MENSAJE = agregarxbits_Automaticamente(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
 ################################################################## COMANDOS ###############################################
