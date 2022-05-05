@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import datetime
 from threading import Thread
 from twitchio.ext import commands
@@ -10,8 +11,9 @@ ArcadesBot = commands.Bot(
     token=BOT_TOKEN, 
     prefix=BOT_PREFIX, 
     initial_channels= CHANNEL)
- 
- #@badge-info=;badges=glitchcon2020/1;color=#FF4500;custom-reward-id=47498d96-f450-4814-ac89-69673043c330;display-name=laider_ush;emotes=;first-msg=0;flags=;id=477019ed-2849-4f46-8f77-ffdc670a10f7;mod=0;room-id=561544295;subscriber=0;tmi-sent-ts=1648848830155;turbo=0;user-id=149696551;user-type= :laider_ush!laider_ush@laider_ush.tmi.twitch.tv PRIVMSG #diktatorshadaloo :2;super megaman
+
+restBits={}
+
 #Se implementa esto aca en vez de el cliente como solucion a que twitch aleatoreamente skipea la escritura de mensajes que se envian por medio del modulo IRC a pesar de ser correctamente enviados.
 def insertarfichas(data):
      #Expresion regular para obtener el input del usuario
@@ -62,8 +64,33 @@ def insertarfichas(data):
         printear(MENSAJE)
         return MENSAJE
 
-def obtenerFicha(data):
-    pass
+def agregarxbits_Automaticamente(data):
+    global restBits
+ # Expresion regular para obtener el usuario.
+    lowuser = re.search(r"[-\w_]*.tmi.twitch.tv",data).group(0).replace('.tmi.twitch.tv','')
+ # Expresion regular para obtener el la cantidad de bits.
+    bits= re.search (r"bits=[0-9]*", data.split('PRIVMSG',1)[0]).group(0).replace('bits=','')
+ # Lo agrego al array de restos de bits.
+    if not (lowuser in restBits):
+        restBits[lowuser]=0
+
+    fichas = int(bits) + restBits[lowuser] // PRECIO_BITS
+    restBits[lowuser]= (int(bits) + restBits[lowuser]) % PRECIO_BITS
+
+ # Reviso que haya obtenido fichas.
+    if (fichas>0):
+        # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
+        cantTotal=actualizar_fichas(lowuser,fichas)
+
+        # Corrijo los plurales para el mensaje de chat.
+        pluralTotal = Plurals(cantTotal)
+        pluralAgregadas = Plurals(fichas)
+        MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (lowuser, fichas, pluralAgregadas, cantTotal, pluralTotal)
+
+    else:
+        MENSAJE = "Oh no! Esos bits no son suficientes para obtener una ficha, cada ficha cuesta %d bits, agrega %d en este stream para obtener una ficha!" % (PRECIO_BITS, PRECIO_BITS-restBits[lowuser])
+
+    return MENSAJE
 
 @ArcadesBot.event()   
 async def event_ready():
@@ -74,7 +101,9 @@ async def event_raw_data(data):
     if 'custom-reward-id' in data and INSERT_COINS_ID in data:
         MENSAJE = insertarfichas(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
-
+    elif 'bits=' in data.split('PRIVMSG',1)[0]:
+        MENSAJE = agregarxbits_Automaticamente(data)
+        await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
 ################################################################## COMANDOS ###############################################
 
 # Comando de ayuda
@@ -142,10 +171,14 @@ async def agregarxbits( ctx , user: str = None, bits: str = None):
             bits.isdigit()
         ):
 
+            global restBits
+            if not (lowuser in restBits):
+                restBits[lowuser]=0
          #Reviso que el monto alcance para comprar una ficha.
-            if (int(bits) >= PRECIO_BITS):
-                fichas = int(bits) // PRECIO_BITS
+            fichas = (int(bits) + restBits[lowuser]) // PRECIO_BITS
+            restBits[lowuser]= (int(bits) + restBits[lowuser]) % PRECIO_BITS
 
+            if (fichas >0):
              # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
                 cantTotal=actualizar_fichas(lowuser,fichas)
 
@@ -155,7 +188,7 @@ async def agregarxbits( ctx , user: str = None, bits: str = None):
                 MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (user, fichas, pluralAgregadas, cantTotal, pluralTotal)
 
             else:
-                MENSAJE = "Oh no! Esos bits no son suficientes para comprar una ficha, cada ficha cuesta %d bits!" % (PRECIO_BITS)
+                MENSAJE = "Oh no! Esos bits no son suficientes para obtener una ficha, cada ficha cuesta %d bits, agrega %d en este stream para obtener una ficha!" % (PRECIO_BITS, PRECIO_BITS-restBits[lowuser])
 
         else: 
             MENSAJE = "Los datos ingresados no son correctos, si tenes dudas de como usar el comando, usa el comando !help."
@@ -273,7 +306,7 @@ async def agregarxdonacion(ctx , user: str = None, dinero: str = None):
                     MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (user, fichas, pluralAgregadas, cantTotal, pluralTotal)
 
                 else:
-                    MENSAJE = "Oh no! Ese monto no es suficiente para comprar una ficha, cada ficha cuesta %s dolares!" % (str(PRECIO_FICHA))
+                    MENSAJE = "Oh no! Ese monto no es suficiente para obtener una ficha, cada ficha cuesta %s dolares!" % (str(PRECIO_FICHA))
                 
         else: 
             MENSAJE = "Los datos ingresados no son correctos, si tenes dudas de como usar el comando, usa el comando !help."
