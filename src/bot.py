@@ -13,7 +13,7 @@ ArcadesBot = commands.Bot(
     initial_channels= CHANNEL)
 
 restBits={}
-
+users_in_chat=[]
 #Se implementa esto aca en vez de el cliente como solucion a que twitch aleatoreamente skipea la escritura de mensajes que se envian por medio del modulo IRC a pesar de ser correctamente enviados.
 def insertarfichas(data):
      #Expresion regular para obtener el input del usuario
@@ -91,6 +91,29 @@ def agregarxbits_Automaticamente(data):
         MENSAJE = "Oh no! Esos bits no son suficientes para obtener una ficha, cada ficha cuesta %d bits, agrega %d en este stream para obtener una ficha!" % (PRECIO_BITS, PRECIO_BITS-restBits[lowuser])
 
     return MENSAJE
+def saludar(data):
+    MENSAJE = ''
+    global users_in_chat
+    lowuser = re.search(r"[-\w_]*.tmi.twitch.tv",data).group(0).replace('.tmi.twitch.tv','')
+    if not (lowuser in users_in_chat) and (not lowuser in [x.lower() for x in MODS]):
+            users_in_chat.append(lowuser)
+            cantFichas = get_fichas_by_user(lowuser)
+            if (cantFichas != None and cantFichas[0] > 0):
+                MENSAJE = "Bienvenido @%s! Recuerda que tienes %d %s para utilizar :)" % (lowuser, cantFichas[0], Plurals(cantFichas[0]))
+    return MENSAJE
+
+def agregarxsub_Automaticamente(data):
+    lowuser = re.search(r"login=[-\w_]*",data).group(0).replace('login=','')
+    fichas = FICHAS_X_SUB
+
+    # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.            
+    cantTotal=actualizar_fichas(lowuser,fichas)
+
+    # Corrijo los plurales para el mensaje de chat.
+    pluralTotal = Plurals(cantTotal)
+    pluralAgregadas = Plurals(fichas)
+    MENSAJE = "%s recibió %d %s. Ahora tiene un total de %d %s." % (lowuser, fichas, pluralAgregadas, cantTotal, pluralTotal)
+    return MENSAJE
 
 @ArcadesBot.event()   
 async def event_ready():
@@ -98,12 +121,21 @@ async def event_ready():
 
 @ArcadesBot.event()
 async def event_raw_data(data):
+    print (data)
     if 'custom-reward-id' in data and INSERT_COINS_ID in data:
         MENSAJE = insertarfichas(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
     elif 'bits=' in data.split('color=',1)[0]:
         MENSAJE = agregarxbits_Automaticamente(data)
         await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
+    elif ('msg-param-was-gifted=false' in data):
+        if ('msg-id=resub' in data.split('tmi.twitch.tv',1)[0]) or ('msg-id=sub' in data.split('tmi.twitch.tv',1)[0]):
+            MENSAJE = agregarxsub_Automaticamente(data)
+            await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
+    elif 'PRIVMSG' in data :
+        MENSAJE = saludar(data)
+        if MENSAJE != '':
+            await ArcadesBot._connection.send(("PRIVMSG %s :") % CHANNEL[0].lower() +MENSAJE)
 ################################################################## COMANDOS ###############################################
 
 # Comando de ayuda
@@ -113,7 +145,13 @@ async def help(ctx):
     await ctx.send(f"%s" % MENSAJE)
     MENSAJE = "Los comandos para mods y espectadores son: %scantfichas <usuario> | %scantgastadas <usuario> | %sgastadortop | %susuariotop | %stotalfichas" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
-###########################################################################################################################
+
+# Comando de ayuda
+@ArcadesBot.command()
+async def info(ctx):
+    MENSAJE = "A quienes apoyan el canal con subs, bits y donaciones les agradecemos con fichas! Estas se pueden usar para que se juegue el arcade que quieras de la lista disponible (!lista) tal como si fuera un arcade! Cuando quieras canjear fichas usa la recompensa InsertarFichas con el formato que ahi se describe"
+    await ctx.send(f"%s" % MENSAJE)
+#####################################################################################
 
 # Comando para agregar fichas a un usuario
 @ArcadesBot.command()
