@@ -14,6 +14,7 @@ ArcadesBot = commands.Bot(
 
 restBits={}
 users_in_chat=[]
+arcadeAbierto = True
 #Se implementa esto aca en vez de el cliente como solucion a que twitch aleatoreamente skipea la escritura de mensajes que se envian por medio del modulo IRC a pesar de ser correctamente enviados.
 def insertarfichas(data):
      #Expresion regular para obtener el input del usuario
@@ -23,44 +24,47 @@ def insertarfichas(data):
         arrayinput = input.split(":", 1)[1].split(";",1)
         fichas_gastadas = (arrayinput[0]).replace(" ","")
      #Chequeo que la fichas sean un entero mayor a 0
-        if fichas_gastadas.isdigit() and int(fichas_gastadas)>0 :
-            fichas_gastadas = int(fichas_gastadas)
+        if arcadeAbierto:
+            if fichas_gastadas.isdigit() and int(fichas_gastadas)>0 :
+                fichas_gastadas = int(fichas_gastadas)
 
-         #Chequeo que la fichas no superen al maximo definido por el dueño del canal.
-            if fichas_gastadas <= FICHAS_MAXIMAS:
-                if len (arrayinput) == 2:
-                    juego = arrayinput[1]. replace("\r\n","") 
-                 #Chequeo que el nombre del juego no sea vacio. 
-                    if juego. replace(" ","") != "":
-                    #Chequeo que el usuario tenga la cantidad de fichas suficientes y actualizo en la base de datos.
-                        restantes = actualizar_fichas(user.lower(),-fichas_gastadas)
-                        if (restantes>=0):
-                            fecha = datetime.now().strftime("%H:%M:%S %d-%m-%y")
-                            data = [user, juego, fichas_gastadas,fecha]
-                            pluralFichas = Plurals(fichas_gastadas)
-                            pluralRestantes = Plurals(restantes)
-                            MENSAJE = "%s le puso %d %s al juego %s, ahora le quedan %d %s" % (user, fichas_gastadas, pluralFichas, juego, restantes, pluralRestantes)
+            #Chequeo que la fichas no superen al maximo definido por el dueño del canal.
+                if fichas_gastadas <= FICHAS_MAXIMAS:
+                    if len (arrayinput) == 2:
+                        juego = arrayinput[1]. replace("\r\n","") 
+                    #Chequeo que el nombre del juego no sea vacio. 
+                        if juego. replace(" ","") != "":
+                        #Chequeo que el usuario tenga la cantidad de fichas suficientes y actualizo en la base de datos.
+                            restantes = actualizar_fichas(user.lower(),-fichas_gastadas)
+                            if (restantes>=0):
+                                fecha = datetime.now().strftime("%H:%M:%S %d-%m-%y")
+                                data = [user, juego, fichas_gastadas,fecha]
+                                pluralFichas = Plurals(fichas_gastadas)
+                                pluralRestantes = Plurals(restantes)
+                                MENSAJE = "%s le puso %d %s al juego %s, ahora le quedan %d %s" % (user, fichas_gastadas, pluralFichas, juego, restantes, pluralRestantes)
 
-                            insert_tablaCanjes(data)
+                                insert_tablaCanjes(data)
 
-                        #Se crean estos txt para utilizar en conjunto con Txt Trigger script para OBS.
-                            with open('UltimoPedido.txt', 'w') as f:
-                                f.write(fecha)
-                            with open('Usuario.txt', 'w') as f:
-                                f.write(("%s inserto %d %s")%(user, fichas_gastadas, pluralFichas))
-                            with open('JuegoPedido.txt', 'w') as d:
-                                d.write(data[1])
-                        else:
-                            MENSAJE = "¡%s no tiene fichas suficientes!" % (user)
+                            #Se crean estos txt para utilizar en conjunto con Txt Trigger script para OBS.
+                                with open('UltimoPedido.txt', 'w') as f:
+                                    f.write(fecha)
+                                with open('Usuario.txt', 'w') as f:
+                                    f.write(("%s inserto %d %s")%(user, fichas_gastadas, pluralFichas))
+                                with open('JuegoPedido.txt', 'w') as d:
+                                    d.write(data[1])
+                            else:
+                                MENSAJE = "¡%s no tiene fichas suficientes!" % (user)
+                        else: 
+                            MENSAJE = "¡No especificaste que juego jugar!"
                     else: 
-                        MENSAJE = "¡No especificaste que juego jugar!"
-                else: 
-                    MENSAJE =  'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
+                        MENSAJE =  'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
+                else:
+                    pluralFichas = Plurals(FICHAS_MAXIMAS)
+                    MENSAJE = "¡Esas son demasiadas fichas! No podes poner mas de %d %s a la vez" % (FICHAS_MAXIMAS, pluralFichas)
             else:
-                pluralFichas = Plurals(FICHAS_MAXIMAS)
-                MENSAJE = "¡Esas son demasiadas fichas! No podes poner mas de %d %s a la vez" % (FICHAS_MAXIMAS, pluralFichas)
+                MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
         else:
-            MENSAJE = 'Formato de pedido incorrecto, recuerda que el formato es <fichas ; nombre_del_juego>, por ejemplo " 3 ; Street Fighter 2 "'
+            MENSAJE = 'El arcade esta cerrado, intenta canjear fichas en el proximo stream'
         printear(MENSAJE)
         return MENSAJE
 
@@ -141,9 +145,9 @@ async def event_raw_data(data):
 # Comando de ayuda
 @ArcadesBot.command()
 async def help(ctx):
-    MENSAJE = "Los comandos solo para mods son: %sagregarfichas <usuario> <fichas> | %sagregarxsub <usuario> | %sagregarxbits <usuario> <bits> | %sagregarxgifts <usuario> <cantidad_regaladas> | %sagregarxdonacion <usuario> <monto> | %ssacarfichas <usuario> <fichas>|  %svaciarfichas <usuario>" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
+    MENSAJE = "Los comandos solo para mods son: %sagregarfichas <usuario> <fichas> | %sagregarxsub <usuario> | %sagregarxbits <usuario> <bits> | %sagregarxgifts <usuario> <cantidad_regaladas> | %sagregarxdonacion <usuario> <monto> | %ssacarfichas <usuario> <fichas>|  %svaciarfichas <usuario> | %scerrar | %sabrir" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
-    MENSAJE = "Los comandos para mods y espectadores son: %scantfichas <usuario> | %scantgastadas <usuario> | %sgastadortop | %susuariotop | %stotalfichas" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
+    MENSAJE = "Los comandos para mods y espectadores son: %scantfichas <usuario> | %scantgastadas <usuario> | %sgastadortop | %susuariotop | %stotalfichas | %sregalarfichas <usuario> <fichas>" % (BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX,BOT_PREFIX)
     await ctx.send(f"%s" % MENSAJE)
 
 # Comando de ayuda
@@ -151,10 +155,42 @@ async def help(ctx):
 async def info(ctx):
     MENSAJE = "A quienes apoyan el canal con subs, bits y donaciones les agradecemos con fichas! Estas se pueden usar para que se juegue el arcade que quieras de la lista disponible (!lista) tal como si fuera un arcade! Cuando quieras canjear fichas usa la recompensa InsertarFichas con el formato que ahi se describe"
     await ctx.send(f"%s" % MENSAJE)
+
+# Comando cerrar arcade
+@ArcadesBot.command()
+async def cerrar(ctx):
+    # Reviso que el comando haya sido usado por un moderador o el dueño del canal.
+    autor = ctx.author.name.lower()
+    global arcadeAbierto
+    if ( autor in [x.lower() for x in MODS] or autor == CHANNEL[0].replace("#","")):
+        arcadeAbierto = False
+        MENSAJE = "Se cierra el arcade, ya no se aceptaran canjes hasta el proximo stream"
+    else:
+        MENSAJE = "%s, Quien chota sos para cerrar el arcade? Cerrate el ojete!!!!" % (ctx.author.name)
+    await ctx.send(f"%s" % MENSAJE)
+
+# Comando cerrar arcade
+@ArcadesBot.command()
+async def abrir(ctx):
+    # Reviso que el comando haya sido usado por un moderador o el dueño del canal.
+    autor = ctx.author.name.lower()
+    global arcadeAbierto
+    if ( autor in [x.lower() for x in MODS] or autor == CHANNEL[0].replace("#","")):
+        arcadeAbierto = True
+        MENSAJE = "Se abre el arcade nuevamente"
+    else:
+        MENSAJE = "%s, Quien chota sos para abrir el arcade? Abrite el ojete!!!!" % (ctx.author.name)
+    await ctx.send(f"%s" % MENSAJE)
 #####################################################################################
 
+AGREGAR_ALIASES = [
+    "sumar",
+    "agregar",
+    "sumarfichas"
+]
+
 # Comando para agregar fichas a un usuario
-@ArcadesBot.command()
+@ArcadesBot.command(aliases=AGREGAR_ALIASES)
 async def agregarfichas( ctx , user: str = None, fichas: str = None):
 
  # Reviso que el comando haya sido usado por un moderador o el dueño del canal.
@@ -356,9 +392,14 @@ async def agregarxdonacion(ctx , user: str = None, dinero: str = None):
     await ctx.send(MENSAJE)
     printear(MENSAJE)
 ###########################################################################################################################
-
+SACAR_ALIASES = [
+    "sacar",
+    "quitar",
+    "quitarfichas",
+    "restar"
+]
 # Comando para sacar fichas a un usuario
-@ArcadesBot.command()
+@ArcadesBot.command(aliases=SACAR_ALIASES)
 async def sacarfichas(ctx , user: str = None, fichas: str = None):
 
  # Reviso que el comando haya sido usado por un moderador o el dueño del canal.
@@ -397,9 +438,50 @@ async def sacarfichas(ctx , user: str = None, fichas: str = None):
         MENSAJE = "%s, no tenés los privilegios para usar este comando." % (ctx.author.name)
     
     printear(MENSAJE)
-    await ctx.send(MENSAJE)        
+    await ctx.send(MENSAJE) 
 ###########################################################################################################################
-    
+DONAR_ALIASES = [
+    "donar",
+    "transferir",
+    "donarfichas",
+    "transferirfichas",
+    "regalar"
+]
+    # Comando para sacar fichas a un usuario
+@ArcadesBot.command(aliases=DONAR_ALIASES)
+async def regalarfichas(ctx , user: str = None, fichas: str = None):
+        autor = ctx.author.name.lower()
+     # Convierto user a minuscula y reviso la entrada.
+     # Admito que el comando sea usado con @user para aprovechar el autocompletado, se le saca el @ para ser almacenado en la DB.
+        lowuser = (user.lower()).replace("@","")
+        if (
+            allowed_chars(lowuser) and 
+            not lowuser.isdigit() and
+            fichas.isdigit() and
+            int(fichas) > 0
+        ):
+            if (autor != lowuser):
+            # Actualizo la cantidad de fichas y obtengo el total para devolverlo en un mensaje de chat.
+                fichas = int(fichas)
+                cantTotal=actualizar_fichas(autor,- fichas)
+                pluralSacadas = Plurals(fichas)
+
+            # Si el usuario tenia las fichas suficientes notifico la cantidad gastada y las fichas restantes.
+                if (cantTotal >=0 ):
+                    actualizar_fichas(lowuser, fichas)
+                    pluralTotal = Plurals(cantTotal)
+                    MENSAJE = " Se regalaron %d %s a %s. Le queda un total de %d %s a %s." % (fichas, pluralSacadas, user, cantTotal, pluralTotal, autor)
+            # Si el usuario no tiene fichas suficientes lo notifico. 
+                else:
+                    MENSAJE = ("Se ha intentado sacar %d %s, pero %s no tiene fichas suficientes") % (fichas, pluralSacadas, autor)
+            else:
+                MENSAJE = "Jaja que gracioso, se quiere regalar fichas a el mismo, me cago de la risa. ¿Porque no te vas a lavar el tuje BRO?"
+        else:
+            MENSAJE = "Los datos ingresados no son correctos, si tenes dudas de como usar el comando, usa el comando !help."
+        printear(MENSAJE)
+        await ctx.send(MENSAJE)
+        
+#########################################################################################################################################################
 
 # Muestra la cantidad de fichas de un usuario
 @ArcadesBot.command()
